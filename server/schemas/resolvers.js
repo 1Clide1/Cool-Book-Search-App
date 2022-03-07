@@ -5,6 +5,7 @@ const { signToken } = require("../utils/auth");
 
 // resovlers basically holds all of the api routes
 const resolvers = {
+  // queries are basically just get requests
   // route to get the user
   Query: {
     me: async (parent, args, context) => {
@@ -23,8 +24,17 @@ const resolvers = {
       );
     },
   },
+  // mutations are basically routes that do something other than a get request
   Mutation: {
-    addUser: async (parent, args, context) => {},
+    // route to add a user
+    addUser: async (parent, args, context) => {
+      // creating a user args represent all of the typeDefs in the user model
+      const addUser = await User.create(args);
+      // once a user is created then giving that user a token
+      const token = signToken(addUser);
+      // using deconstruction returning the token and user that way it can be properly authenticated
+      return { token, addUser };
+    },
     login: async (parent, { email, password }) => {},
     saveBook: async (parent, args, context) => {
       if (context.user) {
