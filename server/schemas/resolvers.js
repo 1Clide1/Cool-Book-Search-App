@@ -35,7 +35,29 @@ const resolvers = {
       // using deconstruction returning the token and user that way it can be properly authenticated
       return { token, addUser };
     },
-    login: async (parent, { email, password }) => {},
+    // route to login
+    // deconstructing the args to specifically get the email and password from the user model
+    login: async (parent, { email, password }) => {
+      // first get the user's email
+      const loginUser = await User.findOne({ email });
+      // if user doesn't exist throw err
+      if (!loginUser) {
+        throw new AuthenticationError(
+          "No users found or user does not exist: wrong credentials(?)"
+        );
+      }
+      // if the user is found then check the password
+      const checkPass = await loginUser.isCorrectPassword(password);
+      // if password is wrong then throw an error
+      if (!checkPass) {
+        throw new AuthenticationError(
+          "password does not match, please try again"
+        );
+      }
+      // if all is good then create a token for the user that way they can log in
+      const token = signToken(loginUser);
+      return { token, loginUser };
+    },
     saveBook: async (parent, args, context) => {
       if (context.user) {
         const updateUser = await User;
