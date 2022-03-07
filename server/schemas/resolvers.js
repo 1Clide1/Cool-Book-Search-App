@@ -58,9 +58,24 @@ const resolvers = {
       const token = signToken(loginUser);
       return { token, loginUser };
     },
+    // route to save the books to a favorite list
     saveBook: async (parent, args, context) => {
+      // check if the user is logged in
       if (context.user) {
-        const updateUser = await User;
+        const updateUser = await User.findOneAndUpdate(
+          { _id: context.user._id },
+          { $push: { savedBooks: args } },
+          { new: true, runValidators: true }
+        );
+        return updateUser;
+      }
+      throw new AuthenticationError(
+        "not logged in, please log in to use this feature"
+      );
+    },
+    removeBook: async (parent, args, context) => {
+      if (context.user) {
+        const updateUser = await User.findOneAndDelete({});
       }
     },
   },
