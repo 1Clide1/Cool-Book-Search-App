@@ -73,10 +73,19 @@ const resolvers = {
         "not logged in, please log in to use this feature"
       );
     },
-    removeBook: async (parent, args, context) => {
+    removeBook: async (parent, { bookId }, context) => {
       if (context.user) {
-        const updateUser = await User.findOneAndDelete({});
+        const updateUser = await User.findOneAndUpdate(
+          { _id: context.user._id },
+          // since the args are the same for bookId you can also just say bookId
+          { $pull: { savedBooks: { bookId: bookId } } },
+          { new: true, runValidators: true }
+        );
+        return updateUser;
       }
+      throw new AuthenticationError(
+        "not logged in, please log in to use this feature"
+      );
     },
   },
 };
