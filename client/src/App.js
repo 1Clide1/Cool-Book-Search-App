@@ -12,7 +12,7 @@ import Navbar from "./components/Navbar";
 
 function App() {
   // creates the link for gql
-  const httplink = createHTTPLink({
+  const httpLink = createHTTPLink({
     uri: "/graphql",
   });
   // this sets up the json web token to work
@@ -27,6 +27,12 @@ function App() {
       },
     };
   });
+
+  const client = new ApolloClient({
+    link: authLink.concat(httpLink),
+    cache: new InMemoryCache(),
+  });
+
   return (
     <ApolloProvider client={client}>
       <Router>
